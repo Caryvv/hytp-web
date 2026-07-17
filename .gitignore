@@ -1,0 +1,21 @@
+# 依赖与构建产物
+node_modules
+dist
+dist-ssr
+
+# TS 构建信息
+*.tsbuildinfo
+
+# 编译误生成（vite.config 由 ts 直接运行，不应产出 js）
+**/vite.config.js
+**/vite.config.d.ts
+
+# 本地环境与日志
+*.local
+*.log
+
+# 编辑器
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
