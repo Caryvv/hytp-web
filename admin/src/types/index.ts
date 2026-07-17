@@ -1,0 +1,120 @@
+// 后端 admin 入口响应类型（字段对齐 common/models 的 toXxxArray 与 DashboardController）。
+
+export interface ApiResponse<T> {
+  code: number
+  message: string
+  data: T
+}
+
+export interface Pagination {
+  page: number
+  pageSize: number
+  total: number
+}
+
+export interface PageData<T> {
+  list: T[]
+  pagination: Pagination
+}
+
+/** 管理员信息（对齐 AdminUser::toArray）。 */
+export interface AdminUser {
+  id: number
+  username: string
+  realName: string
+  roleId: number
+  status: number
+  lastLoginAt: number | null
+}
+
+/** 登录响应（含权限点）。 */
+export interface AdminLoginResult {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+  admin: AdminUser
+  permissions: string[]
+}
+
+/** 商家（对齐 Shop::toAdminArray）。 */
+export interface Shop {
+  id: number
+  account: string
+  name: string
+  type: number
+  region: string
+  contactName: string
+  contactPhone: string
+  creditScore: number
+  deposit: string
+  status: number // 0待审核 1正常 2驳回 3封禁
+  auditRemark: string
+  createdAt: number
+}
+
+/** 商品列表项（对齐 Product::toListArray）。 */
+export interface ProductListItem {
+  id: number
+  shopId: number
+  title: string
+  categoryId: number
+  formeDynasty: number
+  formeType: string
+  style: string
+  tradeType: number
+  price: string
+  cover: string
+  stock: number
+  isOriginal: number
+  sales: number
+  rating: string
+  status: number // 0下架 1在售 2审核中 3违规下架
+}
+
+/** 操作日志（对齐 AdminOperationLog::toArray）。 */
+export interface OperationLog {
+  id: number
+  adminId: number
+  action: string
+  module: string
+  detail: string
+  ip: string
+  createdAt: number
+}
+
+/** 概览指标（对齐 DashboardController::actionIndex）。 */
+export interface DashboardData {
+  shop: { total: number; pending: number; active: number }
+  product: { total: number; auditing: number; onSale: number }
+}
+
+export const SHOP_STATUS_TEXT: Record<number, string> = {
+  0: '待审核',
+  1: '正常',
+  2: '已驳回',
+  3: '已封禁',
+}
+
+export const PRODUCT_STATUS_TEXT: Record<number, string> = {
+  0: '已下架',
+  1: '在售',
+  2: '审核中',
+  3: '违规下架',
+}
+
+export const SHOP_TYPE_TEXT: Record<number, string> = {
+  1: '原创品牌',
+  2: '手作匠人',
+  3: '租赁',
+  4: '妆造',
+  5: '摄影',
+  6: '文旅',
+  7: '非遗',
+}
+
+/** 权限点常量。 */
+export const PERM = {
+  SHOP_AUDIT: 'shop:audit',
+  PRODUCT_AUDIT: 'product:audit',
+  CONFIG_EDIT: 'config:edit',
+} as const
