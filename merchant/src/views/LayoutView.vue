@@ -49,6 +49,7 @@ async function onLogout() {
       <el-menu :default-active="activeMenu" router>
         <el-menu-item index="/dashboard">工作台</el-menu-item>
         <el-menu-item index="/products">商品管理</el-menu-item>
+        <el-menu-item index="/orders">订单管理</el-menu-item>
         <el-menu-item index="/shop">店铺信息</el-menu-item>
       </el-menu>
     </el-aside>

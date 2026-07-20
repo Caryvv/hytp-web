@@ -26,6 +26,7 @@ async function onLogout() {
         <el-menu-item index="/dashboard">概览</el-menu-item>
         <el-menu-item v-if="auth.hasPermission(PERM.SHOP_AUDIT)" index="/shops">商家审核</el-menu-item>
         <el-menu-item v-if="auth.hasPermission(PERM.PRODUCT_AUDIT)" index="/products">商品审核</el-menu-item>
+        <el-menu-item v-if="auth.hasPermission(PERM.ORDER_MANAGE)" index="/orders">订单监控</el-menu-item>
         <el-menu-item index="/logs">操作日志</el-menu-item>
       </el-menu>
     </el-aside>
