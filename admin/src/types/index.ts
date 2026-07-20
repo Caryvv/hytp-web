@@ -119,6 +119,7 @@ export const PERM = {
   CONFIG_EDIT: 'config:edit',
   ORDER_MANAGE: 'order:manage',
   REFUND_ARBITRATE: 'refund:arbitrate',
+  DEPOSIT_ARBITRATE: 'deposit:arbitrate',
 } as const
 
 // ---------------- 订单 / 售后（阶段3+ 管理端订单监控 + 仲裁） ----------------
@@ -191,6 +192,32 @@ export const ORDER_STATUS_TEXT: Record<number, string> = {
   4: '已完成',
   5: '已取消',
   6: '售后中',
+  7: '使用中',
+  8: '待归还',
+  9: '已归还',
+}
+
+/** 品质保障金理赔单（对齐 DepositClaim::toArray + Service 附加 orderNo/shopName/shopDeposit）。 */
+export interface DepositClaim {
+  id: number
+  orderId: number
+  orderNo?: string
+  shopId: number
+  shopName?: string
+  shopDeposit?: string
+  userId: number
+  amount: string
+  reason: string
+  evidence: string[]
+  status: number // 0待判定 1成立赔付 2驳回
+  handleRemark: string
+  createdAt: number
+}
+
+export const DEPOSIT_CLAIM_STATUS_TEXT: Record<number, string> = {
+  0: '待判定',
+  1: '成立赔付',
+  2: '已驳回',
 }
 
 export const REFUND_STATUS_TEXT: Record<number, string> = {

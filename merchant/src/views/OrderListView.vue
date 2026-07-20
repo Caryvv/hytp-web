@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { handleRefund, listOrders, listRefunds, shipOrder } from '@/api/order'
+import { confirmReturn, handleRefund, listOrders, listRefunds, shipOrder } from '@/api/order'
 import {
   ORDER_STATUS_TEXT,
   REFUND_STATUS_TEXT,
@@ -24,6 +24,9 @@ function orderTagType(status: number): 'success' | 'info' | 'warning' | 'danger'
     case 4: return 'success'   // 已完成
     case 5: return 'info'      // 已取消
     case 6: return 'danger'    // 售后
+    case 7: return 'primary'   // 使用中
+    case 8: return 'warning'   // 待归还
+    case 9: return 'primary'   // 已归还
     default: return 'info'
   }
 }
@@ -66,6 +69,17 @@ async function submitShip() {
   } finally {
     shipping.value = false
   }
+}
+
+async function onConfirmReturn(row: Order) {
+  try {
+    await ElMessageBox.confirm(`确认已收到订单「${row.orderNo}」的归还？将退还买家押金。`, '确认归还')
+  } catch {
+    return
+  }
+  await confirmReturn(row.orderNo)
+  ElMessage.success('已确认归还，押金已退')
+  load()
 }
 
 // ---- 售后列表 ----
@@ -169,6 +183,7 @@ onMounted(load)
           <el-table-column label="操作" width="120">
             <template #default="{ row }">
               <el-button v-if="row.status === 1" link type="primary" @click="openShip(row)">发货</el-button>
+              <el-button v-else-if="row.status === 8" link type="success" @click="onConfirmReturn(row)">确认归还</el-button>
               <span v-else>—</span>
             </template>
           </el-table-column>

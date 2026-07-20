@@ -209,7 +209,7 @@ export interface Refund {
   createdAt: number
 }
 
-/** 订单状态文案。 */
+/** 订单状态文案（含租赁状态 7/8/9）。 */
 export const ORDER_STATUS_TEXT: Record<number, string> = {
   0: '待付款',
   1: '待发货',
@@ -217,6 +217,9 @@ export const ORDER_STATUS_TEXT: Record<number, string> = {
   4: '已完成',
   5: '已取消',
   6: '售后中',
+  7: '使用中',
+  8: '待归还',
+  9: '已归还',
 }
 
 /** 售后状态文案。 */

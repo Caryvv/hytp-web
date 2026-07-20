@@ -23,6 +23,11 @@ export function shipOrder(
   return request<Order>({ url: `/orders/${orderNo}/ship`, method: 'post', data: payload })
 }
 
+/** 租赁：确认归还（待归还→已完成，退押金）。 */
+export function confirmReturn(orderNo: string): Promise<Order> {
+  return request<Order>({ url: `/orders/${orderNo}/confirm-return`, method: 'post' })
+}
+
 /** 本店售后列表。 */
 export function listRefunds(params: {
   status?: number | ''

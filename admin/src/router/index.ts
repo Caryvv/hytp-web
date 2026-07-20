@@ -38,6 +38,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '订单监控' },
       },
       {
+        path: 'deposit-claims',
+        name: 'deposit-claims',
+        component: () => import('@/views/DepositClaimView.vue'),
+        meta: { title: '保障金理赔' },
+      },
+      {
         path: 'logs',
         name: 'logs',
         component: () => import('@/views/LogView.vue'),
