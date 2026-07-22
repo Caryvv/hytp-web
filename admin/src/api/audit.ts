@@ -1,5 +1,5 @@
 import { request } from '@/utils/request'
-import type { PageData, ProductListItem, Shop } from '@/types'
+import type { FeedListItem, PageData, ProductListItem, Shop } from '@/types'
 
 /** 商家列表（可按状态/类型/关键词筛选）。 */
 export function listShops(params: {
@@ -37,5 +37,24 @@ export function auditProduct(id: number, pass: boolean, remark = ''): Promise<Pr
     url: `/products/${id}/audit`,
     method: 'post',
     data: { pass, remark },
+  })
+}
+
+/** 动态巡查列表（默认 status=1 正常）。 */
+export function listFeeds(params: {
+  status?: number | ''
+  userId?: number | ''
+  page?: number
+  pageSize?: number
+}): Promise<PageData<FeedListItem>> {
+  return request<PageData<FeedListItem>>({ url: '/feeds', method: 'get', params })
+}
+
+/** 巡查处置：off=true 下架（需 remark），false 恢复。 */
+export function setFeedStatus(id: number, off: boolean, remark = ''): Promise<FeedListItem> {
+  return request<FeedListItem>({
+    url: `/feeds/${id}/audit`,
+    method: 'post',
+    data: { off, remark },
   })
 }

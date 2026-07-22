@@ -44,6 +44,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '保障金理赔' },
       },
       {
+        path: 'feeds',
+        name: 'feeds',
+        component: () => import('@/views/FeedManageView.vue'),
+        meta: { title: '动态巡查' },
+      },
+      {
         path: 'logs',
         name: 'logs',
         component: () => import('@/views/LogView.vue'),

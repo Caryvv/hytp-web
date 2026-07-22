@@ -102,6 +102,31 @@ export const PRODUCT_STATUS_TEXT: Record<number, string> = {
   3: '违规下架',
 }
 
+/** 动态巡查项（对齐 Feed::toAdminArray）。 */
+export interface FeedListItem {
+  id: number
+  userId: number
+  content: string
+  mediaType: number
+  media: string[]
+  tags: string[]
+  city: string
+  likeCount: number
+  commentCount: number
+  favoriteCount: number
+  shareCount: number
+  status: number // 0待审 1正常 2已下架
+  offReason: string
+  createdAt: number
+  author: { id: number; nickname: string; avatar: string } | null
+}
+
+export const FEED_STATUS_TEXT: Record<number, string> = {
+  0: '待审核',
+  1: '正常',
+  2: '已下架',
+}
+
 export const SHOP_TYPE_TEXT: Record<number, string> = {
   1: '原创品牌',
   2: '手作匠人',
@@ -120,6 +145,7 @@ export const PERM = {
   ORDER_MANAGE: 'order:manage',
   REFUND_ARBITRATE: 'refund:arbitrate',
   DEPOSIT_ARBITRATE: 'deposit:arbitrate',
+  FEED_AUDIT: 'feed:audit',
 } as const
 
 // ---------------- 订单 / 售后（阶段3+ 管理端订单监控 + 仲裁） ----------------
