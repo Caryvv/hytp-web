@@ -1,0 +1,21 @@
+{
+  "name": "hytp-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "汉韵同袍 AI 微服务：情感分析（DeepSeek）。Yii2 内网 HTTP + HMAC 调用。",
+  "scripts": {
+    "start": "node --env-file=.env --import tsx src/server.ts",
+    "dev": "node --env-file=.env --watch --import tsx src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "~5.7.2"
+  }
+}
