@@ -58,3 +58,12 @@ export function setFeedStatus(id: number, off: boolean, remark = ''): Promise<Fe
     data: { off, remark },
   })
 }
+
+/** 待审动态审核（敏感词命中后人工处置）：pass=true 通过，false 驳回下架（需 remark）。 */
+export function reviewFeed(id: number, pass: boolean, remark = ''): Promise<FeedListItem> {
+  return request<FeedListItem>({
+    url: `/feeds/${id}/review`,
+    method: 'post',
+    data: { pass, remark },
+  })
+}

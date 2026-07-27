@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listFeeds, setFeedStatus } from '@/api/audit'
+import { listFeeds, reviewFeed, setFeedStatus } from '@/api/audit'
 import { FEED_STATUS_TEXT, type FeedListItem } from '@/types'
 
 const loading = ref(false)
@@ -54,6 +54,31 @@ async function onRestore(row: FeedListItem) {
   ElMessage.success('已恢复')
   load()
 }
+
+async function onPass(row: FeedListItem) {
+  try {
+    await ElMessageBox.confirm('确认通过该动态？通过后对用户可见。', '通过审核')
+  } catch {
+    return
+  }
+  await reviewFeed(row.id, true)
+  ElMessage.success('已通过')
+  load()
+}
+
+async function onReject(row: FeedListItem) {
+  try {
+    const { value } = await ElMessageBox.prompt('请填写驳回理由', '驳回动态', {
+      inputPattern: /\S+/,
+      inputErrorMessage: '驳回理由不能为空',
+    })
+    await reviewFeed(row.id, false, value)
+    ElMessage.success('已驳回下架')
+    load()
+  } catch {
+    // 取消
+  }
+}
 </script>
 
 <template>
@@ -95,10 +120,14 @@ async function onRestore(row: FeedListItem) {
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="150">
         <template #default="{ row }">
           <el-button v-if="row.status === 1" link type="danger" @click="onOff(row)">下架</el-button>
           <el-button v-else-if="row.status === 2" link type="success" @click="onRestore(row)">恢复</el-button>
+          <template v-else-if="row.status === 0">
+            <el-button link type="success" @click="onPass(row)">通过</el-button>
+            <el-button link type="danger" @click="onReject(row)">驳回</el-button>
+          </template>
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
