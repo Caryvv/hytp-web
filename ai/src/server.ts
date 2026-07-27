@@ -1,6 +1,6 @@
 import express from 'express'
 import { verifySign } from './sign.ts'
-import { analyzeSentiment } from './deepseek.ts'
+import { analyzeSentiment, answerQa, type QaTurn } from './deepseek.ts'
 
 const app = express()
 const PORT = Number(process.env.PORT ?? 8790)
@@ -31,6 +31,37 @@ app.post(
     } catch (e) {
       // 让 Yii2 侧回退规则版；这里如实返 502 + 原因
       console.error('[sentiment] DeepSeek 调用失败:', e)
+      res.status(502).json({ error: String(e instanceof Error ? e.message : e) })
+    }
+  },
+)
+
+/**
+ * POST /ai/qa —— { question: string, history?: [{role,content}] } → { answer, hitKnowledge }
+ * 汉服知识问答，多轮上下文。
+ */
+app.post(
+  '/ai/qa',
+  express.raw({ type: '*/*', limit: '256kb' }),
+  verifySign,
+  async (req, res) => {
+    const body = req.body as { question?: unknown; history?: unknown }
+    const question = String(body.question ?? '').trim()
+    if (question === '') {
+      res.status(400).json({ error: 'question 不能为空' })
+      return
+    }
+    const history: QaTurn[] = Array.isArray(body.history)
+      ? body.history
+          .map((t) => t as { role?: unknown; content?: unknown })
+          .filter((t) => (t.role === 'user' || t.role === 'assistant') && typeof t.content === 'string')
+          .map((t) => ({ role: t.role as 'user' | 'assistant', content: String(t.content) }))
+      : []
+    try {
+      const result = await answerQa(question, history)
+      res.json(result)
+    } catch (e) {
+      console.error('[qa] DeepSeek 调用失败:', e)
       res.status(502).json({ error: String(e instanceof Error ? e.message : e) })
     }
   },
