@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import type { UploadRequestOptions } from 'element-plus'
 import {
   createProduct,
   listProducts,
   toggleProduct,
   updateProduct,
 } from '@/api/product'
+import { uploadImage } from '@/api/upload'
 import {
   DYNASTY_OPTIONS,
   PRODUCT_STATUS_TEXT,
@@ -70,6 +72,20 @@ const defaultForm = (): ProductForm => ({
   isOriginal: 0,
 })
 const form = reactive<ProductForm>(defaultForm())
+const coverUploading = ref(false)
+
+/** el-upload 自定义上传：直传 OSS，成功回填封面 URL。 */
+async function onCoverUpload(opt: UploadRequestOptions) {
+  coverUploading.value = true
+  try {
+    form.cover = await uploadImage(opt.file)
+    ElMessage.success('封面已上传')
+  } catch (e) {
+    ElMessage.error(e instanceof Error ? e.message : '封面上传失败')
+  } finally {
+    coverUploading.value = false
+  }
+}
 
 function openCreate() {
   editingId.value = null
@@ -223,8 +239,22 @@ async function onToggle(row: ProductListItem) {
         <el-form-item label="是否原创">
           <el-switch v-model="form.isOriginal" :active-value="1" :inactive-value="0" />
         </el-form-item>
-        <el-form-item label="封面URL">
-          <el-input v-model="form.cover" placeholder="OSS 图片地址" />
+        <el-form-item label="封面图">
+          <el-upload
+            :show-file-list="false"
+            accept="image/*"
+            :http-request="onCoverUpload"
+          >
+            <el-image
+              v-if="form.cover"
+              :src="form.cover"
+              fit="cover"
+              style="width: 96px; height: 96px; border-radius: 6px"
+            />
+            <el-button v-else :loading="coverUploading" type="primary" plain>
+              {{ coverUploading ? '上传中…' : '选择封面' }}
+            </el-button>
+          </el-upload>
         </el-form-item>
         <el-form-item label="图文详情">
           <el-input v-model="form.detail" type="textarea" :rows="3" />

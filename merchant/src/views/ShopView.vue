@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import type { UploadRequestOptions } from 'element-plus'
 import { addQualification, getQualifications, updateShop } from '@/api/shop'
+import { uploadImage } from '@/api/upload'
 import { useAuthStore } from '@/stores/auth'
 import {
   SHOP_STATUS_TEXT,
@@ -20,6 +22,20 @@ const form = reactive({
   type: 1,
 })
 const saving = ref(false)
+const logoUploading = ref(false)
+
+/** el-upload 自定义上传：直传 OSS，成功回填 logo URL。 */
+async function onLogoUpload(opt: UploadRequestOptions) {
+  logoUploading.value = true
+  try {
+    form.logo = await uploadImage(opt.file)
+    ElMessage.success('Logo 已上传')
+  } catch (e) {
+    ElMessage.error(e instanceof Error ? e.message : 'Logo 上传失败')
+  } finally {
+    logoUploading.value = false
+  }
+}
 
 function syncForm() {
   if (!auth.shop) return
@@ -108,8 +124,22 @@ onMounted(async () => {
         <el-form-item label="产区">
           <el-input v-model="form.region" />
         </el-form-item>
-        <el-form-item label="Logo URL">
-          <el-input v-model="form.logo" placeholder="OSS 图片地址" />
+        <el-form-item label="Logo">
+          <el-upload
+            :show-file-list="false"
+            accept="image/*"
+            :http-request="onLogoUpload"
+          >
+            <el-image
+              v-if="form.logo"
+              :src="form.logo"
+              fit="cover"
+              style="width: 96px; height: 96px; border-radius: 6px"
+            />
+            <el-button v-else :loading="logoUploading" type="primary" plain>
+              {{ logoUploading ? '上传中…' : '选择 Logo' }}
+            </el-button>
+          </el-upload>
         </el-form-item>
         <el-form-item label="联系人">
           <el-input v-model="form.contactName" />

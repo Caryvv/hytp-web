@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "ali-oss": "^6.21.0",
     "axios": "^1.7.9",
     "element-plus": "^2.9.1",
     "pinia": "^2.3.0",
@@ -16,6 +17,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@types/ali-oss": "^6.23.3",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "typescript": "~5.7.2",
