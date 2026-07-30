@@ -50,6 +50,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '动态巡查' },
       },
       {
+        path: 'configs',
+        name: 'configs',
+        component: () => import('@/views/ConfigView.vue'),
+        meta: { title: '平台配置' },
+      },
+      {
         path: 'logs',
         name: 'logs',
         component: () => import('@/views/LogView.vue'),

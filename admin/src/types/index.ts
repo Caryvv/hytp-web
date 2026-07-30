@@ -146,7 +146,28 @@ export const PERM = {
   REFUND_ARBITRATE: 'refund:arbitrate',
   DEPOSIT_ARBITRATE: 'deposit:arbitrate',
   FEED_AUDIT: 'feed:audit',
+  SHOP_PENALTY: 'shop:penalty',
 } as const
+
+/** 平台配置项（对齐 ConfigService::decorate）。type：rate=0~1小数 / string=纯文本。 */
+export interface SysConfigItem {
+  key: string
+  value: string | null
+  label: string
+  desc: string
+  type: string
+  persisted: boolean
+}
+
+/** 商家信用流水（对齐 ShopPenaltyService::creditLogs）。 */
+export interface CreditLog {
+  id: number
+  change: number
+  reason: string
+  refType: string
+  refId: number | null
+  createdAt: number
+}
 
 // ---------------- 订单 / 售后（阶段3+ 管理端订单监控 + 仲裁） ----------------
 
