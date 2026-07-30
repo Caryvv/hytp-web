@@ -67,6 +67,7 @@ app.post(
   },
 )
 
-app.listen(PORT, () => {
+// 只绑 127.0.0.1：HMAC 内网调用，绝不对公网暴露（不指定 host 时 Express 默认绑 *）
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`hytp-ai 微服务已启动: http://127.0.0.1:${PORT}`)
 })
