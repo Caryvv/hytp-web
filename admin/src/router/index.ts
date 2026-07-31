@@ -56,6 +56,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '平台配置' },
       },
       {
+        path: 'app-versions',
+        name: 'app-versions',
+        component: () => import('@/views/AppVersionView.vue'),
+        meta: { title: '版本管理' },
+      },
+      {
         path: 'logs',
         name: 'logs',
         component: () => import('@/views/LogView.vue'),

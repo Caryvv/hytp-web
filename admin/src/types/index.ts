@@ -159,6 +159,21 @@ export interface SysConfigItem {
   persisted: boolean
 }
 
+/** App 版本（对齐 AppVersion::toAdminArray）。 */
+export interface AppVersion {
+  id: number
+  platform: string
+  versionCode: number
+  versionName: string
+  updateLog: string
+  downloadUrl: string
+  forceUpdate: boolean
+  minSupportedCode: number
+  enabled: boolean
+  createdAt: number
+  updatedAt: number
+}
+
 /** 商家信用流水（对齐 ShopPenaltyService::creditLogs）。 */
 export interface CreditLog {
   id: number
