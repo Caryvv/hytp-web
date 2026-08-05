@@ -147,7 +147,36 @@ export const PERM = {
   DEPOSIT_ARBITRATE: 'deposit:arbitrate',
   FEED_AUDIT: 'feed:audit',
   SHOP_PENALTY: 'shop:penalty',
+  CONTENT_MANAGE: 'content:manage',
 } as const
+
+/** 文旅+文化内容（对齐 Content::toAdminArray）。 */
+export interface Content {
+  id: number
+  type: number // 1文旅 2文化传承
+  title: string
+  cover: string
+  images: string[]
+  detail: string
+  city: string
+  category: string
+  likeCount: number
+  favoriteCount: number
+  signupCount: number
+  status: number // 0下架 1上线
+  createdAt: number
+  updatedAt: number
+}
+
+export const CONTENT_TYPE_TEXT: Record<number, string> = {
+  1: '文旅',
+  2: '文化传承',
+}
+
+export const CONTENT_STATUS_TEXT: Record<number, string> = {
+  0: '已下线',
+  1: '已上线',
+}
 
 /** 平台配置项（对齐 ConfigService::decorate）。type：rate=0~1小数 / string=纯文本。 */
 export interface SysConfigItem {

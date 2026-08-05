@@ -31,6 +31,7 @@ async function onLogout() {
         <el-menu-item v-if="auth.hasPermission(PERM.FEED_AUDIT)" index="/feeds">动态巡查</el-menu-item>
         <el-menu-item v-if="auth.hasPermission(PERM.CONFIG_EDIT)" index="/configs">平台配置</el-menu-item>
         <el-menu-item v-if="auth.hasPermission(PERM.CONFIG_EDIT)" index="/app-versions">版本管理</el-menu-item>
+        <el-menu-item v-if="auth.hasPermission(PERM.CONTENT_MANAGE)" index="/contents">文旅文化管理</el-menu-item>
         <el-menu-item index="/logs">操作日志</el-menu-item>
       </el-menu>
     </el-aside>
