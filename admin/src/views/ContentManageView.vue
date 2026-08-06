@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { createContent, deleteContent, listContents, toggleContent, updateContent } from '@/api/content'
+import { uploadImageToOss } from '@/api/upload'
 import { CONTENT_STATUS_TEXT, CONTENT_TYPE_TEXT, type Content } from '@/types'
 
 const loading = ref(false)
@@ -11,8 +12,9 @@ const query = reactive({ type: '' as number | '', status: '' as number | '', pag
 
 const dialogVisible = ref(false)
 const editingId = ref<number | null>(null)
-// 图集：换行分隔的多行文本，提交时拆成数组
-const imagesText = ref('')
+// 图集图片 URL 列表（OSS 直传后回填）
+const images = ref<string[]>([])
+const uploading = ref(false)
 
 const form = reactive({
   type: 1,
@@ -39,7 +41,7 @@ onMounted(load)
 function openCreate() {
   editingId.value = null
   Object.assign(form, { type: 1, title: '', cover: '', detail: '', city: '', category: '', status: 1 })
-  imagesText.value = ''
+  images.value = []
   dialogVisible.value = true
 }
 
@@ -49,8 +51,30 @@ function openEdit(row: Content) {
     type: row.type, title: row.title, cover: row.cover, detail: row.detail,
     city: row.city, category: row.category, status: row.status,
   })
-  imagesText.value = (row.images || []).join('\n')
+  images.value = [...(row.images || [])]
   dialogVisible.value = true
+}
+
+/** 选图后 OSS 直传，成功回填 URL。target: cover=封面 / gallery=图集追加。 */
+async function onPickImage(e: Event, target: 'cover' | 'gallery') {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  ;(e.target as HTMLInputElement).value = '' // 允许重复选同一文件
+  if (!file) return
+  uploading.value = true
+  try {
+    const url = await uploadImageToOss(file)
+    if (target === 'cover') form.cover = url
+    else images.value.push(url)
+    ElMessage.success('上传成功')
+  } catch (err) {
+    ElMessage.error(err instanceof Error ? err.message : '上传失败')
+  } finally {
+    uploading.value = false
+  }
+}
+
+function removeImage(i: number) {
+  images.value.splice(i, 1)
 }
 
 async function onSubmit() {
@@ -58,8 +82,7 @@ async function onSubmit() {
     ElMessage.error('请填写标题')
     return
   }
-  const images = imagesText.value.split('\n').map((s) => s.trim()).filter(Boolean)
-  const payload = { ...form, images }
+  const payload = { ...form, images: images.value }
   if (editingId.value === null) {
     await createContent(payload)
     ElMessage.success('已新增内容')
@@ -158,10 +181,25 @@ async function onDelete(row: Content) {
           <el-input v-model="form.title" placeholder="如 西塘汉服文化周" />
         </el-form-item>
         <el-form-item label="封面图">
-          <el-input v-model="form.cover" placeholder="封面图 URL" />
+          <div class="uploader">
+            <img v-if="form.cover" :src="form.cover" class="cover-preview" />
+            <label class="pick-btn">
+              {{ form.cover ? '更换封面' : '上传封面' }}
+              <input type="file" accept="image/*" :disabled="uploading" hidden @change="(e) => onPickImage(e, 'cover')" />
+            </label>
+          </div>
         </el-form-item>
         <el-form-item label="图集">
-          <el-input v-model="imagesText" type="textarea" :rows="3" placeholder="每行一个图片 URL" />
+          <div class="gallery">
+            <div v-for="(img, i) in images" :key="i" class="thumb">
+              <img :src="img" />
+              <span class="remove" @click="removeImage(i)">×</span>
+            </div>
+            <label class="pick-btn">
+              添加图片
+              <input type="file" accept="image/*" :disabled="uploading" hidden @change="(e) => onPickImage(e, 'gallery')" />
+            </label>
+          </div>
         </el-form-item>
         <el-form-item label="地点">
           <el-input v-model="form.city" placeholder="如 杭州" style="width: 200px" />
@@ -193,5 +231,59 @@ async function onDelete(row: Content) {
 }
 .muted {
   color: #c0c4cc;
+}
+.uploader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cover-preview {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+.thumb .remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  text-align: center;
+  background: #f56c6c;
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+}
+.pick-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 32px;
+  border: 1px dashed var(--el-color-primary);
+  color: var(--el-color-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
 }
 </style>
